@@ -19,7 +19,10 @@ const Calendar = () => {
       {/* Calendar Section */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="section-title text-center mb-8">Our Schedule</h2>
+          <h2 className="text-2xl font-semibold text-band-dark text-center mb-2">Our Schedule</h2>
+          <p className="text-center text-lg text-gray-700 mb-8">
+            <span className="font-semibold text-band-highlight">Next Up:</span> Last Lap January 30th
+          </p>
 
           {/* Google Calendar Embed */}
           <div className="bg-band-light rounded-2xl p-4 md:p-6 shadow-lg">

@@ -17,10 +17,10 @@ const Calendar = () => {
       </section>
 
       {/* Calendar Section */}
-      <section className="py-12 bg-white">
+      <section className="py-6 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-band-dark text-center mb-2">Our Schedule</h2>
-          <p className="text-center text-lg text-gray-700 mb-8">
+          <h2 className="text-3xl font-semibold text-band-dark text-center mb-1">Our Schedule</h2>
+          <p className="text-center text-xl text-gray-700 mb-4">
             <span className="font-semibold text-band-highlight">Next Up:</span> Last Lap January 30th
           </p>
 

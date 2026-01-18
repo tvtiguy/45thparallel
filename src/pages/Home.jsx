@@ -26,7 +26,7 @@ const Home = () => {
     {
       name: 'Mark Moulding',
       role: 'Keyboards',
-      image: null,
+      image: '/mark-moulding.jpg',
     },
   ]
 

@@ -27,8 +27,8 @@ const About = () => {
     {
       name: 'Mark Moulding',
       role: 'Keyboards',
-      image: null,
-      bio: `Mark brings his keyboard skills to round out the 45th Parallel sound, adding depth and texture to our performances.`,
+      image: '/mark-moulding.jpg',
+      bio: `Mark, from the Southern California area, began playing music quite early, with piano lessons at age six and string bass at eight. After playing bass in various stage bands and as the youngest member of the Peninsula Symphony orchestra, he set aside the bass to play keyboards in college in a coffee-house duo, including an appearance on the Gong Show (the girl with the guitar won...). Following college, he played in a variety of local bands, recording two albums with the Rich Harper Blues Band before taking a break to start an engineering company. Returning to music in the "aughts", he co-founded the Wrongway Feldon band in the Bay area, then moved to the Portland area and 45th Parallel.`,
     },
   ]
 

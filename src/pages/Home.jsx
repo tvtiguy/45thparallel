@@ -14,11 +14,6 @@ const Home = () => {
       image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/416e4f19-5c0e-425f-848b-27bc22d3cccd/IMG_20220504_140420446-1.jpg',
     },
     {
-      name: 'Bruce Rupprecht',
-      role: 'Bass & Vocals',
-      image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/b727ea3d-7ff8-4bb0-a158-930048b76051/IMG_6811.jpg',
-    },
-    {
       name: 'John Wesson',
       role: 'Guitar & Vocals',
       image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/36e315c2-cced-4007-8013-8bc2cef95d87/JohnEdited.png',
@@ -27,6 +22,11 @@ const Home = () => {
       name: 'Mark Moulding',
       role: 'Keyboards',
       image: '/mark-moulding.jpg',
+    },
+    {
+      name: 'Tracy Dragoo',
+      role: 'Bass & Vocals',
+      image: '/tracy-dragoo.png',
     },
   ]
 

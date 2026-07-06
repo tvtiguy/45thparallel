@@ -13,12 +13,6 @@ const About = () => {
       bio: `Hailing from the area near Wilsonville, Rich began drum lessons in 1973 at age nine. His first professional gig was with the Jon Bricker Blues Band in 1985 at the University of Portland. He joined KC Project, a 50s/60s band, in 1986, then moved to "Groove," an original fusion funk band, in 1989. After leaving performing in 1992 to pursue songwriting, Rich joined "Beverly Hillsboro" in 2016, which eventually evolved into "45th Parallel" in 2022.`,
     },
     {
-      name: 'Bruce Rupprecht',
-      role: 'Bass Guitar & Vocals',
-      image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/b727ea3d-7ff8-4bb0-a158-930048b76051/IMG_6811.jpg',
-      bio: `Originally from Minneapolis, Minnesota, Bruce started his musical journey young, playing trombone and bass in high school during the 1970s and performing in various Midwest groups. After taking a break to raise a family, he resumed playing in the 1990s with Portland band "Public Nuisance," covering classic rock hits. He later performed with a community orchestra for holiday events before joining "Beverly Hillsboro" in 2020. The band performed at Hillsboro Hops opener games in 2021 and eventually became "45th Parallel" after adding Mike on lead guitar and Mark M. on keys.`,
-    },
-    {
       name: 'John Wesson',
       role: 'Guitar & Vocals',
       image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/36e315c2-cced-4007-8013-8bc2cef95d87/JohnEdited.png',
@@ -29,6 +23,16 @@ const About = () => {
       role: 'Keyboards',
       image: '/mark-moulding.jpg',
       bio: `Mark, from the Southern California area, began playing music quite early, with piano lessons at age six and string bass at eight. After playing bass in various stage bands and as the youngest member of the Peninsula Symphony orchestra, he set aside the bass to play keyboards in college in a coffee-house duo, including an appearance on the Gong Show (the girl with the guitar won...). Following college, he played in a variety of local bands, recording two albums with the Rich Harper Blues Band before taking a break to start an engineering company. Returning to music in the "aughts", he co-founded the Wrongway Feldman band in the Bay area, then moved to the Portland area and 45th Parallel.`,
+    },
+    {
+      name: 'Tracy Dragoo',
+      role: 'Bass & Vocals',
+      image: '/tracy-dragoo.png',
+      bio: `Tracy Dragoo is a bass player born and raised in Southern California whose passion for music began in the fourth grade with the upright bass. By high school, Tracy had made the switch to electric bass and quickly found a home performing with Top 40 bands throughout the Southern California music scene. Since those early days, music has remained a constant part of life, with decades of live performance experience and a deep love for connecting with audiences through groove and rhythm.
+
+Rooted in the sounds of R&B, soul, disco, and classic rock, Tracy developed a versatile playing style influenced by the rich musical diversity of California's live music circuit. Over the past ten years, that musical journey has continued to grow, adding country and flamenco to an already wide-ranging list of genres enjoyed both on stage and in the studio.
+
+Throughout a long-running career, Tracy has been fortunate to occasionally perform and record with several well-known artists and musicians in Southern California, experiences that helped shape both musicianship and professionalism. Now based in the Pacific Northwest, Tracy is excited to continue performing, collaborating, and bringing years of experience and passion to new musical opportunities.`,
     },
   ]
 
@@ -57,7 +61,7 @@ const About = () => {
             </p>
             <p className="mb-6">
               Based in Hillsboro, Oregon, we bring together musicians from diverse backgrounds - from
-              the blues clubs of Chicago to the rock scenes of Minneapolis and Portland. This mix of
+              the blues clubs of Chicago to the stages of Southern California and Portland. This mix of
               influences allows us to cover an incredible range of music, from the British Invasion
               of the 60s to today's chart-toppers.
             </p>
@@ -110,8 +114,10 @@ const About = () => {
 
                 {/* Bio */}
                 <div className="w-full lg:w-2/3">
-                  <div className="bg-white rounded-2xl p-8 shadow-lg">
-                    <p className="text-gray-700 leading-relaxed">{member.bio}</p>
+                  <div className="bg-white rounded-2xl p-8 shadow-lg space-y-4">
+                    {member.bio.trim().split('\n\n').map((paragraph, i) => (
+                      <p key={i} className="text-gray-700 leading-relaxed">{paragraph}</p>
+                    ))}
                   </div>
                 </div>
               </div>

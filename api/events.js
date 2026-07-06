@@ -7,18 +7,18 @@
 // The password is checked against the ADMIN_PASSWORD environment variable.
 // Blob access uses the auto-injected BLOB_READ_WRITE_TOKEN.
 
-import { put, list } from '@vercel/blob'
+import { put, get } from '@vercel/blob'
 
 const BLOB_PATH = 'events.json'
 
 async function readEvents() {
-  const { blobs } = await list({ prefix: BLOB_PATH })
-  const match = blobs.find((b) => b.pathname === BLOB_PATH)
-  if (!match) return []
-  const res = await fetch(match.url, { cache: 'no-store' })
-  if (!res.ok) return []
+  // get() returns null when the file doesn't exist yet (no shows added).
+  // Any other error propagates so callers never overwrite good data with [].
+  const result = await get(BLOB_PATH, { access: 'private' })
+  if (!result || !result.stream) return []
+  const text = await new Response(result.stream).text()
   try {
-    const data = await res.json()
+    const data = JSON.parse(text)
     return Array.isArray(data) ? data : []
   } catch {
     return []
@@ -27,7 +27,7 @@ async function readEvents() {
 
 async function writeEvents(events) {
   await put(BLOB_PATH, JSON.stringify(events), {
-    access: 'public',
+    access: 'private',
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: 'application/json',

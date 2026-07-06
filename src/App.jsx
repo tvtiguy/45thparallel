@@ -6,6 +6,7 @@ import About from './pages/About'
 import Media from './pages/Media'
 import Calendar from './pages/Calendar'
 import Contact from './pages/Contact'
+import ManageShows from './pages/ManageShows'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/media" element={<Media />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/manage-shows-6b2f" element={<ManageShows />} />
         </Routes>
       </main>
       <Footer />

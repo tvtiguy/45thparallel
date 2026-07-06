@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
-import { fetchEvents, upcomingSorted, formatDateParts } from '../lib/events'
+import { fetchEvents, upcomingSorted, formatDateParts, displayTime, timeOptions } from '../lib/events'
+
+const TIME_OPTS = timeOptions()
 
 const EMPTY_FORM = {
   date: '',
-  time: '',
+  startTime: '',
+  endTime: '',
   venue: '',
   city: '',
   address: '',
@@ -15,6 +18,7 @@ const ManageShows = () => {
   const [unlocked, setUnlocked] = useState(() => Boolean(sessionStorage.getItem('adminPw')))
   const [events, setEvents] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
+  const [editingId, setEditingId] = useState(null)
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -61,7 +65,29 @@ const ManageShows = () => {
 
   const updateField = (field) => (e) => setForm({ ...form, [field]: e.target.value })
 
-  const addShow = async (e) => {
+  const startEdit = (event) => {
+    setEditingId(event.id)
+    setForm({
+      date: event.date || '',
+      startTime: event.startTime || '',
+      endTime: event.endTime || '',
+      venue: event.venue || '',
+      city: event.city || '',
+      address: event.address || '',
+      fbUrl: event.fbUrl || '',
+    })
+    setError('')
+    setStatus('')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setForm(EMPTY_FORM)
+    setError('')
+  }
+
+  const saveShow = async (e) => {
     e.preventDefault()
     setError('')
     setStatus('')
@@ -71,15 +97,17 @@ const ManageShows = () => {
     }
     setBusy(true)
     try {
+      const editing = Boolean(editingId)
       const res = await fetch('/api/events', {
-        method: 'POST',
+        method: editing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
-        body: JSON.stringify(form),
+        body: JSON.stringify(editing ? { ...form, id: editingId } : form),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Something went wrong.')
       setForm(EMPTY_FORM)
-      setStatus(`Added ${data.venue}.`)
+      setEditingId(null)
+      setStatus(`${editing ? 'Updated' : 'Added'} ${data.venue}.`)
       await load()
     } catch (err) {
       setError(err.message)
@@ -100,6 +128,7 @@ const ManageShows = () => {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Something went wrong.')
+      if (editingId === event.id) cancelEdit()
       setStatus(`Deleted ${event.venue}.`)
       await load()
     } catch (err) {
@@ -110,7 +139,7 @@ const ManageShows = () => {
   }
 
   const inputClass =
-    'w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-band-highlight'
+    'w-full rounded-lg border border-gray-300 px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-band-highlight'
 
   // Password gate
   if (!unlocked) {
@@ -139,6 +168,8 @@ const ManageShows = () => {
     )
   }
 
+  const editing = Boolean(editingId)
+
   // Manager
   return (
     <div className="pt-28 pb-20 min-h-screen bg-band-light">
@@ -150,24 +181,43 @@ const ManageShows = () => {
           </button>
         </div>
 
-        {/* Add form */}
+        {/* Add / Edit form */}
         <div className="bg-white rounded-2xl p-6 shadow-lg mb-8">
-          <h2 className="font-semibold text-band-dark mb-4">Add a Show</h2>
-          <form onSubmit={addShow} className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-band-dark">{editing ? 'Edit Show' : 'Add a Show'}</h2>
+            {editing && (
+              <button onClick={cancelEdit} className="text-sm text-gray-500 hover:text-band-highlight">
+                Cancel
+              </button>
+            )}
+          </div>
+          <form onSubmit={saveShow} className="space-y-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Date *</label>
+              <input type="date" value={form.date} onChange={updateField('date')} className={inputClass} />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Date *</label>
-                <input type="date" value={form.date} onChange={updateField('date')} className={inputClass} />
+                <label className="block text-sm text-gray-600 mb-1">Start time</label>
+                <select value={form.startTime} onChange={updateField('startTime')} className={inputClass}>
+                  <option value="">—</option>
+                  {TIME_OPTS.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Time</label>
-                <input
-                  type="text"
-                  value={form.time}
-                  onChange={updateField('time')}
-                  placeholder="5:00 – 8:00 PM"
-                  className={inputClass}
-                />
+                <label className="block text-sm text-gray-600 mb-1">End time</label>
+                <select value={form.endTime} onChange={updateField('endTime')} className={inputClass}>
+                  <option value="">—</option>
+                  {TIME_OPTS.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div>
@@ -217,7 +267,7 @@ const ManageShows = () => {
             {status && <p className="text-green-600 text-sm">{status}</p>}
 
             <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-50">
-              {busy ? 'Saving…' : 'Add Show'}
+              {busy ? 'Saving…' : editing ? 'Save Changes' : 'Add Show'}
             </button>
           </form>
         </div>
@@ -231,7 +281,12 @@ const ManageShows = () => {
             {events.map((event) => {
               const { month, day, year } = formatDateParts(event.date)
               return (
-                <div key={event.id} className="flex items-center gap-4 bg-white rounded-xl p-4 shadow">
+                <div
+                  key={event.id}
+                  className={`flex items-center gap-4 bg-white rounded-xl p-4 shadow ${
+                    editingId === event.id ? 'ring-2 ring-band-highlight' : ''
+                  }`}
+                >
                   <div className="flex-shrink-0 text-center min-w-[3.5rem]">
                     <div className="text-band-highlight font-display text-sm">{month}</div>
                     <div className="text-2xl font-display text-band-dark leading-none">{day}</div>
@@ -240,9 +295,16 @@ const ManageShows = () => {
                   <div className="flex-grow min-w-0">
                     <p className="font-semibold text-band-dark truncate">{event.venue}</p>
                     <p className="text-gray-500 text-sm truncate">
-                      {[event.city, event.time].filter(Boolean).join(' · ')}
+                      {[event.city, displayTime(event)].filter(Boolean).join(' · ')}
                     </p>
                   </div>
+                  <button
+                    onClick={() => startEdit(event)}
+                    disabled={busy}
+                    className="flex-shrink-0 text-sm text-band-highlight hover:text-band-dark disabled:opacity-50"
+                  >
+                    Edit
+                  </button>
                   <button
                     onClick={() => deleteShow(event)}
                     disabled={busy}

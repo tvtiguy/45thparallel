@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchEvents, upcomingSorted, formatDateParts, mapsUrl } from '../lib/events'
+import { fetchEvents, upcomingSorted, formatDateParts, mapsUrl, displayTime } from '../lib/events'
 
 const FacebookIcon = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ const FeaturedShow = ({ event }) => {
             <p className="text-gray-300 mt-1">{event.city}</p>
           )}
           <p className="text-band-highlight font-semibold mt-2">
-            {weekday} &middot; {event.time}
+            {weekday} &middot; {displayTime(event)}
           </p>
         </div>
         {/* Action */}
@@ -91,7 +91,7 @@ const ShowCard = ({ event }) => {
           <p className="text-gray-600 text-sm">{event.city}</p>
         )}
         <p className="text-gray-500 text-sm mt-1">
-          {weekday} &middot; {event.time}
+          {weekday} &middot; {displayTime(event)}
         </p>
       </div>
       {/* Action */}

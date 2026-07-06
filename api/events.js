@@ -53,7 +53,9 @@ function cleanEvent(body) {
   return {
     id: globalThis.crypto?.randomUUID?.() || String(Date.now()),
     date, // YYYY-MM-DD
-    time: String(body.time || '').trim(),
+    startTime: String(body.startTime || '').trim(),
+    endTime: String(body.endTime || '').trim(),
+    time: String(body.time || '').trim(), // legacy free-text fallback
     venue,
     city: String(body.city || '').trim(),
     address: String(body.address || '').trim(),
@@ -88,6 +90,22 @@ export default async function handler(req, res) {
       return res.status(200).json(event)
     }
 
+    if (req.method === 'PUT') {
+      if (!isAuthorized(req)) {
+        return res.status(401).json({ error: 'Incorrect password.', configured: passwordConfigured() })
+      }
+      const id = req.body?.id
+      if (!id) return res.status(400).json({ error: 'Missing id.' })
+      const cleaned = cleanEvent(req.body || {})
+      if (!cleaned) return res.status(400).json({ error: 'Date and venue are required.' })
+      const events = await readEvents()
+      const idx = events.findIndex((e) => e.id === id)
+      if (idx === -1) return res.status(404).json({ error: 'Show not found.' })
+      events[idx] = { ...cleaned, id } // keep the original id
+      await writeEvents(events)
+      return res.status(200).json(events[idx])
+    }
+
     if (req.method === 'DELETE') {
       if (!isAuthorized(req)) {
         return res.status(401).json({ error: 'Incorrect password.', configured: passwordConfigured() })
@@ -99,7 +117,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true })
     }
 
-    res.setHeader('Allow', 'GET, POST, DELETE')
+    res.setHeader('Allow', 'GET, POST, PUT, DELETE')
     return res.status(405).json({ error: 'Method not allowed.' })
   } catch (err) {
     return res.status(500).json({ error: String(err?.message || err) })

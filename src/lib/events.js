@@ -51,6 +51,28 @@ export function mapsUrl(address) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
 }
 
+// Every half-hour slot as a 12-hour label, e.g. "5:00 PM". Used by the
+// start/end time dropdowns on the admin page.
+export function timeOptions() {
+  const out = []
+  for (let h = 0; h < 24; h++) {
+    for (const m of [0, 30]) {
+      const period = h < 12 ? 'AM' : 'PM'
+      const hour12 = h % 12 === 0 ? 12 : h % 12
+      out.push(`${hour12}:${String(m).padStart(2, '0')} ${period}`)
+    }
+  }
+  return out
+}
+
+// The time a show should display, from start/end dropdowns, with a fallback
+// to the older free-text `time` field for shows saved before dropdowns.
+export function displayTime(event) {
+  if (event.startTime && event.endTime) return `${event.startTime} – ${event.endTime}`
+  if (event.startTime) return event.startTime
+  return event.time || ''
+}
+
 // Parse a YYYY-MM-DD string as a local date (avoids UTC off-by-one).
 function localDate(dateStr) {
   return new Date(`${dateStr}T00:00:00`)

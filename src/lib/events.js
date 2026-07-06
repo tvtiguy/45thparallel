@@ -9,11 +9,30 @@ const SAMPLE_EVENTS = [
   {
     id: 'weil-2026-07-21',
     date: '2026-07-21',
-    time: '5:00 – 8:00 PM',
+    startTime: '5:00 PM',
+    endTime: '8:00 PM',
     venue: 'Weil Arcade',
     city: 'Hillsboro, OR',
     address: '233 E Main St, Hillsboro, OR 97123',
     fbUrl: 'https://www.facebook.com/events/1325683682879547/',
+  },
+  // Past-dated entries below are LOCAL PREVIEW ONLY (they only appear when the
+  // /api/events endpoint is unavailable, e.g. plain `npm run dev`). Production
+  // uses real data from the cloud, so these never show on the live site.
+  {
+    id: 'sample-past-1',
+    date: '2026-06-26',
+    venue: 'Weil Arcade',
+    city: 'Hillsboro, OR',
+    address: '233 E Main St, Hillsboro, OR 97123',
+    fbUrl: '',
+  },
+  {
+    id: 'sample-past-2',
+    date: '2026-06-24',
+    venue: 'Stockpot Broiler',
+    city: 'Beaverton, OR',
+    fbUrl: '',
   },
 ]
 
@@ -44,6 +63,14 @@ export function upcomingSorted(events) {
   return [...events]
     .filter((e) => e.date >= today)
     .sort((a, b) => a.date.localeCompare(b.date))
+}
+
+// Past shows (before today), most recent first.
+export function pastSorted(events) {
+  const today = todayStr()
+  return [...events]
+    .filter((e) => e.date < today)
+    .sort((a, b) => b.date.localeCompare(a.date))
 }
 
 // Google Maps directions link for a street address.

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchEvents, upcomingSorted, formatDateParts, displayTime, timeOptions } from '../lib/events'
+import { fetchEvents, upcomingSorted, pastSorted, formatDateParts, displayTime, timeOptions } from '../lib/events'
 
 const TIME_OPTS = timeOptions()
 
@@ -17,6 +17,8 @@ const ManageShows = () => {
   const [password, setPassword] = useState(() => sessionStorage.getItem('adminPw') || '')
   const [unlocked, setUnlocked] = useState(() => Boolean(sessionStorage.getItem('adminPw')))
   const [events, setEvents] = useState([])
+  const [pastEvents, setPastEvents] = useState([])
+  const [showPast, setShowPast] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [editingId, setEditingId] = useState(null)
   const [status, setStatus] = useState('')
@@ -26,7 +28,11 @@ const ManageShows = () => {
   const [unlocking, setUnlocking] = useState(false)
 
   // Load current shows (GET is public).
-  const load = () => fetchEvents().then((data) => setEvents(upcomingSorted(data)))
+  const load = () =>
+    fetchEvents().then((data) => {
+      setEvents(upcomingSorted(data))
+      setPastEvents(pastSorted(data))
+    })
   useEffect(() => {
     load()
   }, [])
@@ -170,6 +176,44 @@ const ManageShows = () => {
 
   const editing = Boolean(editingId)
 
+  const showRow = (event) => {
+    const { month, day, year } = formatDateParts(event.date)
+    return (
+      <div
+        key={event.id}
+        className={`flex items-center gap-4 bg-white rounded-xl p-4 shadow ${
+          editingId === event.id ? 'ring-2 ring-band-highlight' : ''
+        }`}
+      >
+        <div className="flex-shrink-0 text-center min-w-[3.5rem]">
+          <div className="text-band-highlight font-display text-sm">{month}</div>
+          <div className="text-2xl font-display text-band-dark leading-none">{day}</div>
+          <div className="text-gray-400 text-xs">{year}</div>
+        </div>
+        <div className="flex-grow min-w-0">
+          <p className="font-semibold text-band-dark truncate">{event.venue}</p>
+          <p className="text-gray-500 text-sm truncate">
+            {[event.city, displayTime(event)].filter(Boolean).join(' · ')}
+          </p>
+        </div>
+        <button
+          onClick={() => startEdit(event)}
+          disabled={busy}
+          className="flex-shrink-0 text-sm text-band-highlight hover:text-band-dark disabled:opacity-50"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => deleteShow(event)}
+          disabled={busy}
+          className="flex-shrink-0 text-sm text-red-500 hover:text-red-700 disabled:opacity-50"
+        >
+          Delete
+        </button>
+      </div>
+    )
+  }
+
   // Manager
   return (
     <div className="pt-28 pb-20 min-h-screen bg-band-light">
@@ -272,49 +316,25 @@ const ManageShows = () => {
           </form>
         </div>
 
-        {/* Current shows */}
+        {/* Upcoming shows */}
         <h2 className="font-semibold text-band-dark mb-4">Upcoming Shows ({events.length})</h2>
         {events.length === 0 ? (
           <p className="text-gray-500">No upcoming shows yet.</p>
         ) : (
-          <div className="space-y-3">
-            {events.map((event) => {
-              const { month, day, year } = formatDateParts(event.date)
-              return (
-                <div
-                  key={event.id}
-                  className={`flex items-center gap-4 bg-white rounded-xl p-4 shadow ${
-                    editingId === event.id ? 'ring-2 ring-band-highlight' : ''
-                  }`}
-                >
-                  <div className="flex-shrink-0 text-center min-w-[3.5rem]">
-                    <div className="text-band-highlight font-display text-sm">{month}</div>
-                    <div className="text-2xl font-display text-band-dark leading-none">{day}</div>
-                    <div className="text-gray-400 text-xs">{year}</div>
-                  </div>
-                  <div className="flex-grow min-w-0">
-                    <p className="font-semibold text-band-dark truncate">{event.venue}</p>
-                    <p className="text-gray-500 text-sm truncate">
-                      {[event.city, displayTime(event)].filter(Boolean).join(' · ')}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => startEdit(event)}
-                    disabled={busy}
-                    className="flex-shrink-0 text-sm text-band-highlight hover:text-band-dark disabled:opacity-50"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteShow(event)}
-                    disabled={busy}
-                    className="flex-shrink-0 text-sm text-red-500 hover:text-red-700 disabled:opacity-50"
-                  >
-                    Delete
-                  </button>
-                </div>
-              )
-            })}
+          <div className="space-y-3">{events.map(showRow)}</div>
+        )}
+
+        {/* Past shows (collapsed by default) */}
+        {pastEvents.length > 0 && (
+          <div className="mt-10">
+            <button
+              onClick={() => setShowPast(!showPast)}
+              className="flex items-center gap-2 font-semibold text-band-dark hover:text-band-highlight transition-colors"
+            >
+              <span>{showPast ? '▾' : '▸'}</span>
+              Past Shows ({pastEvents.length})
+            </button>
+            {showPast && <div className="space-y-3 mt-4">{pastEvents.map(showRow)}</div>}
           </div>
         )}
       </div>

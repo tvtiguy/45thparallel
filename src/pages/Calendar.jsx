@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchEvents, upcomingSorted, formatDateParts, mapsUrl, displayTime } from '../lib/events'
+import { fetchEvents, upcomingSorted, pastSorted, formatDateParts, mapsUrl, displayTime } from '../lib/events'
 
 const FacebookIcon = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24">
@@ -111,20 +111,52 @@ const ShowCard = ({ event }) => {
   )
 }
 
+// Compact row for a past show in the "We've Played" archive.
+const PastShowRow = ({ event }) => {
+  const { month, day, year } = formatDateParts(event.date)
+  return (
+    <div className="flex items-center gap-3 py-2.5 border-b border-gray-100 text-sm">
+      <span className="text-gray-400 font-display tracking-wide w-24 flex-shrink-0">
+        {month} {day}, {year}
+      </span>
+      <span className="font-semibold text-band-dark truncate">{event.venue}</span>
+      {event.city && <span className="text-gray-500 truncate hidden sm:inline">{event.city}</span>}
+      {event.fbUrl && (
+        <a
+          href={event.fbUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto flex-shrink-0 text-gray-400 hover:text-band-highlight transition-colors"
+          aria-label="Facebook event"
+        >
+          <FacebookIcon className="w-4 h-4" />
+        </a>
+      )}
+    </div>
+  )
+}
+
+const PAST_PREVIEW_COUNT = 8
+
 const Calendar = () => {
-  const [events, setEvents] = useState(null) // null = loading
+  const [allEvents, setAllEvents] = useState(null) // null = loading
+  const [showAllPast, setShowAllPast] = useState(false)
 
   useEffect(() => {
     let active = true
     fetchEvents().then((data) => {
-      if (active) setEvents(upcomingSorted(data))
+      if (active) setAllEvents(data)
     })
     return () => {
       active = false
     }
   }, [])
 
-  const [featured, ...rest] = events || []
+  const loading = allEvents === null
+  const upcoming = loading ? [] : upcomingSorted(allEvents)
+  const past = loading ? [] : pastSorted(allEvents)
+  const [featured, ...rest] = upcoming
+  const visiblePast = showAllPast ? past : past.slice(0, PAST_PREVIEW_COUNT)
 
   return (
     <div className="pt-20">
@@ -139,11 +171,11 @@ const Calendar = () => {
       {/* Shows Section */}
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {events === null ? (
+          {loading ? (
             /* Loading */
             <p className="text-center text-gray-400 py-12">Loading shows&hellip;</p>
-          ) : events.length === 0 ? (
-            /* Empty state */
+          ) : upcoming.length === 0 ? (
+            /* No upcoming shows */
             <div className="text-center bg-band-light rounded-2xl p-10">
               <h2 className="text-2xl font-display text-band-dark mb-3">No shows on the calendar right now</h2>
               <p className="text-gray-600 mb-6">
@@ -177,6 +209,33 @@ const Calendar = () => {
               )}
 
               <p className="text-center text-gray-400 text-sm">All times are Pacific (PT)</p>
+            </div>
+          )}
+
+          {/* We've Played (past shows archive) */}
+          {!loading && past.length > 0 && (
+            <div className="mt-16 pt-10 border-t border-gray-200">
+              <h2 className="text-2xl font-display tracking-wide text-band-dark text-center mb-2">
+                We&rsquo;ve Played
+              </h2>
+              <p className="text-center text-gray-500 text-sm mb-8">
+                A look back at some of our shows.
+              </p>
+              <div className="max-w-2xl mx-auto">
+                {visiblePast.map((event) => (
+                  <PastShowRow key={event.id} event={event} />
+                ))}
+              </div>
+              {past.length > PAST_PREVIEW_COUNT && (
+                <div className="text-center mt-6">
+                  <button
+                    onClick={() => setShowAllPast(!showAllPast)}
+                    className="btn-secondary text-sm"
+                  >
+                    {showAllPast ? 'Show Less' : `Show All ${past.length} Past Shows`}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

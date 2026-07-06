@@ -27,6 +27,7 @@ const Home = () => {
       name: 'Tracy Dragoo',
       role: 'Bass & Vocals',
       image: '/tracy-dragoo.png',
+      imgClass: 'scale-[1.6] origin-top -translate-y-8 group-hover:scale-[1.7]',
     },
   ]
 
@@ -60,7 +61,7 @@ const Home = () => {
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className={`w-full h-full object-cover transition-transform duration-500 ${member.imgClass || 'group-hover:scale-110'}`}
                     />
                   ) : (
                     <div className="w-full h-full bg-band-accent flex items-center justify-center">

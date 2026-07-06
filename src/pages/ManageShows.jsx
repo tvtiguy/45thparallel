@@ -18,6 +18,8 @@ const ManageShows = () => {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [unlockError, setUnlockError] = useState('')
+  const [unlocking, setUnlocking] = useState(false)
 
   // Load current shows (GET is public).
   const load = () => fetchEvents().then((data) => setEvents(upcomingSorted(data)))
@@ -25,11 +27,30 @@ const ManageShows = () => {
     load()
   }, [])
 
-  const unlock = (e) => {
+  const unlock = async (e) => {
     e.preventDefault()
     if (!password.trim()) return
-    sessionStorage.setItem('adminPw', password)
-    setUnlocked(true)
+    setUnlocking(true)
+    setUnlockError('')
+    try {
+      const res = await fetch('/api/events?check=1', {
+        headers: { 'x-admin-password': password },
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(
+          data.configured === false
+            ? 'The site is missing its ADMIN_PASSWORD setting on the server. (Check Vercel env vars.)'
+            : 'Incorrect password.'
+        )
+      }
+      sessionStorage.setItem('adminPw', password)
+      setUnlocked(true)
+    } catch (err) {
+      setUnlockError(err.message)
+    } finally {
+      setUnlocking(false)
+    }
   }
 
   const lock = () => {
@@ -107,8 +128,9 @@ const ManageShows = () => {
                 className={inputClass}
                 autoFocus
               />
-              <button type="submit" className="btn-primary w-full">
-                Unlock
+              {unlockError && <p className="text-red-600 text-sm">{unlockError}</p>}
+              <button type="submit" disabled={unlocking} className="btn-primary w-full disabled:opacity-50">
+                {unlocking ? 'Checking…' : 'Unlock'}
               </button>
             </form>
           </div>

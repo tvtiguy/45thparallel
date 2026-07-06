@@ -35,9 +35,15 @@ async function writeEvents(events) {
 }
 
 function isAuthorized(req) {
-  const provided = req.headers['x-admin-password']
-  const expected = process.env.ADMIN_PASSWORD
-  return Boolean(expected) && provided === expected
+  const provided = String(req.headers['x-admin-password'] || '').trim()
+  const expected = String(process.env.ADMIN_PASSWORD || '').trim()
+  return expected.length > 0 && provided === expected
+}
+
+// Reported (as a boolean only, never the value) so we can tell a missing
+// env var apart from a wrong password when debugging.
+function passwordConfigured() {
+  return Boolean(String(process.env.ADMIN_PASSWORD || '').trim())
 }
 
 function cleanEvent(body) {
@@ -58,13 +64,22 @@ function cleanEvent(body) {
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
+      // Password validation probe used by the admin unlock screen.
+      if (req.query.check !== undefined) {
+        if (!isAuthorized(req)) {
+          return res.status(401).json({ ok: false, configured: passwordConfigured() })
+        }
+        return res.status(200).json({ ok: true })
+      }
       const events = await readEvents()
       res.setHeader('Cache-Control', 'no-store')
       return res.status(200).json(events)
     }
 
     if (req.method === 'POST') {
-      if (!isAuthorized(req)) return res.status(401).json({ error: 'Incorrect password.' })
+      if (!isAuthorized(req)) {
+        return res.status(401).json({ error: 'Incorrect password.', configured: passwordConfigured() })
+      }
       const event = cleanEvent(req.body || {})
       if (!event) return res.status(400).json({ error: 'Date and venue are required.' })
       const events = await readEvents()
@@ -74,7 +89,9 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
-      if (!isAuthorized(req)) return res.status(401).json({ error: 'Incorrect password.' })
+      if (!isAuthorized(req)) {
+        return res.status(401).json({ error: 'Incorrect password.', configured: passwordConfigured() })
+      }
       const id = req.query.id
       if (!id) return res.status(400).json({ error: 'Missing id.' })
       const events = await readEvents()

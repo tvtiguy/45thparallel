@@ -34,12 +34,36 @@ const Home = () => {
   return (
     <div>
       {/* Hero Section */}
-      <Hero
-        title="45th PARALLEL"
-        subtitle="Portland Area Cover Band"
-        description="Playing hits from the 60s to the 2020s. Book us for your next event!"
-        backgroundImage="https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/17d51b53-c7f4-4ee9-9f5d-77137da00ccf/P1040590+2.JPG"
-      />
+      {/* Temporary hero: Tracy's promo image (logo baked in) shown uncropped,
+          with the pitch + buttons just below. Swap back to <Hero> once we have
+          the new group shot from the 7/21 gig. */}
+      <section className="pt-20 bg-band-dark">
+        <img
+          src="/hero-promo.jpg"
+          alt="45th Parallel band on stage at sunset"
+          className="w-full h-auto"
+        />
+        <div className="text-center px-4 sm:px-6 py-10 sm:py-12 max-w-3xl mx-auto">
+          <p className="text-xl sm:text-2xl md:text-3xl text-band-highlight font-light mb-4">
+            Portland Area Cover Band
+          </p>
+          <p className="text-lg sm:text-xl text-gray-300 mb-8">
+            Playing hits from the 60s to the 2020s. Book us for your next event!
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/contact" className="btn-primary text-lg">
+              Book Us Now
+            </Link>
+            <Link
+              to="/media"
+              className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold
+                         hover:bg-white hover:text-band-dark transition-all duration-300"
+            >
+              Watch Us Play
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* About Teaser Section */}
       <section className="py-20 bg-white">

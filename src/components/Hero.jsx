@@ -7,35 +7,48 @@ const Hero = ({
   showButtons = true,
   backgroundImage = null,
   overlay = true,
-  size = "full" // "full" or "medium"
+  size = "full", // "full" or "medium"
+  contentPosition = "center" // "bottom" when the image has the logo/title baked in
 }) => {
   const heightClass = size === "full" ? "min-h-screen" : "min-h-[60vh]"
+  const bottom = contentPosition === "bottom"
 
   return (
     <section
-      className={`relative ${heightClass} flex items-center justify-center`}
+      className={`relative ${heightClass} flex ${bottom ? 'items-end' : 'items-center'} justify-center`}
       style={{
         backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)',
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
       }}
     >
-      {/* Overlay */}
+      {/* Overlay: full gradient normally; bottom-weighted when content sits at the bottom
+          so the image (and its baked-in logo) stays bright */}
       {overlay && backgroundImage && (
-        <div className="absolute inset-0 gradient-overlay"></div>
+        <div
+          className={`absolute inset-0 ${
+            bottom ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'gradient-overlay'
+          }`}
+        ></div>
       )}
 
       {/* Content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display text-white tracking-wider mb-4 text-shadow animate-fade-in">
-          {title}
-        </h1>
+      <div
+        className={`relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto ${
+          bottom ? 'pb-24 sm:pb-28' : ''
+        }`}
+      >
+        {title && (
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display text-white tracking-wider mb-4 text-shadow animate-fade-in">
+            {title}
+          </h1>
+        )}
 
-        <p className="text-xl sm:text-2xl md:text-3xl text-band-highlight font-light mb-6">
+        <p className={`text-xl sm:text-2xl md:text-3xl text-band-highlight font-light ${bottom ? 'mb-3 text-shadow' : 'mb-6'}`}>
           {subtitle}
         </p>
 
-        <p className="text-lg sm:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+        <p className={`text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto ${bottom ? 'mb-6 text-shadow' : 'mb-10'}`}>
           {description}
         </p>
 

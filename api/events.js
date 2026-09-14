@@ -12,6 +12,34 @@ import { put, get, BlobPreconditionFailedError } from '@vercel/blob'
 const BLOB_PATH = 'events.json'
 const MAX_WRITE_ATTEMPTS = 5
 
+const WRITE_OPTIONS = {
+  access: 'private',
+  addRandomSuffix: false,
+  allowOverwrite: true,
+  contentType: 'application/json',
+}
+
+// get() hands back the raw HTTP ETag header, which is quoted ("abc") and may
+// carry a weak-validator prefix. The x-if-match header wants the bare value.
+function normalizeEtag(raw) {
+  if (!raw) return null
+  return raw.trim().replace(/^W\//, '').replace(/^"(.*)"$/, '$1') || null
+}
+
+function writeEvents(events, etag) {
+  return put(BLOB_PATH, JSON.stringify(events), {
+    ...WRITE_OPTIONS,
+    ...(etag ? { ifMatch: etag } : {}),
+  })
+}
+
+function isConflict(err) {
+  return (
+    err instanceof BlobPreconditionFailedError ||
+    err?.name === 'BlobPreconditionFailedError'
+  )
+}
+
 // Reads the show list plus the blob's current ETag, which mutations pass back
 // as `ifMatch` so two overlapping saves can't silently overwrite each other.
 async function readEvents() {
@@ -20,7 +48,7 @@ async function readEvents() {
   const result = await get(BLOB_PATH, { access: 'private' })
   if (!result || !result.stream) return { events: [], etag: null }
   const text = await new Response(result.stream).text()
-  const etag = result.blob?.etag ?? null
+  const etag = normalizeEtag(result.blob?.etag)
   try {
     const data = JSON.parse(text)
     return { events: Array.isArray(data) ? data : [], etag }
@@ -45,20 +73,23 @@ async function mutateEvents(apply) {
     if (outcome.error) return outcome
 
     try {
-      await put(BLOB_PATH, JSON.stringify(outcome.events), {
-        access: 'private',
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        contentType: 'application/json',
-        // No ETag means the file doesn't exist yet; nothing to conflict with.
-        ...(etag ? { ifMatch: etag } : {}),
-      })
+      // No ETag means the file doesn't exist yet; nothing to conflict with.
+      await writeEvents(outcome.events, etag)
       return outcome
     } catch (err) {
-      const conflict =
-        err instanceof BlobPreconditionFailedError ||
-        err?.name === 'BlobPreconditionFailedError'
-      if (!conflict) throw err
+      if (!isConflict(err)) throw err
+
+      // Tell a real concurrent save apart from a precondition we can't rely on:
+      // re-read, and if the ETag is unchanged then nothing actually moved
+      // underneath us. In that case save unconditionally rather than block the
+      // user -- this is the same behaviour we had before conditional writes.
+      const { etag: current } = await readEvents()
+      if (etag && current === etag) {
+        console.warn('[events] ifMatch rejected despite unchanged ETag; saving unconditionally')
+        await writeEvents(outcome.events, null)
+        return outcome
+      }
+
       if (attempt === MAX_WRITE_ATTEMPTS) {
         // A rejected conditional write saves nothing, so no data was lost --
         // surface a retryable message rather than the raw SDK error.

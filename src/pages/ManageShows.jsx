@@ -27,6 +27,25 @@ const ManageShows = () => {
   const [unlockError, setUnlockError] = useState('')
   const [unlocking, setUnlocking] = useState(false)
 
+  // A password cached from an earlier visit may have since been changed, so
+  // re-check it on load rather than trusting it -- otherwise the page looks
+  // unlocked but every save fails with "Incorrect password."
+  useEffect(() => {
+    const cached = sessionStorage.getItem('adminPw')
+    if (!cached) return
+    fetch('/api/events?check=1', { headers: { 'x-admin-password': cached } })
+      .then((res) => {
+        if (res.ok) return
+        sessionStorage.removeItem('adminPw')
+        setPassword('')
+        setUnlocked(false)
+        setUnlockError('Your saved password is no longer valid. Please sign in again.')
+      })
+      .catch(() => {
+        /* offline or API unavailable (e.g. plain vite dev) -- leave as-is */
+      })
+  }, [])
+
   // Load current shows (GET is public).
   const load = () =>
     fetchEvents().then((data) => {

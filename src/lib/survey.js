@@ -4,12 +4,35 @@ export const DEFAULT_RATING = 3 // "Fine - right time, right place"
 
 // Band scale. `value` is what gets stored; NEVER is handled as a veto in the
 // results rather than folded into an average.
+// Each option gets its own colour as well as its own glyph, so the five
+// positions stay tellable apart at small sizes without reading the emoji.
 export const SCALE = [
-  { value: 5, emoji: '❤️', label: 'Love it', hint: 'gotta keep it' },
-  { value: 4, emoji: '👍', label: 'Good', hint: 'happy to play it' },
-  { value: 3, emoji: '😐', label: 'Fine', hint: 'right time, right place' },
-  { value: 2, emoji: '👎', label: 'Meh', hint: "I'd rather not" },
-  { value: -1, emoji: '🚫', label: 'Never again', hint: '' },
+  {
+    value: 5, emoji: '❤️', label: 'Love it', hint: 'gotta keep it',
+    idle: 'bg-rose-50 hover:bg-rose-100',
+    on: 'bg-rose-500 ring-2 ring-rose-600',
+  },
+  {
+    value: 4, emoji: '👍', label: 'Good', hint: 'happy to play it',
+    idle: 'bg-emerald-50 hover:bg-emerald-100',
+    on: 'bg-emerald-500 ring-2 ring-emerald-600',
+  },
+  {
+    value: 3, emoji: '😐', label: 'Fine', hint: 'right time, right place',
+    idle: 'bg-slate-100 hover:bg-slate-200',
+    on: 'bg-slate-400 ring-2 ring-slate-500',
+  },
+  {
+    value: 2, emoji: '👎', label: 'Meh', hint: "I'd rather not",
+    idle: 'bg-amber-50 hover:bg-amber-100',
+    on: 'bg-amber-500 ring-2 ring-amber-600',
+  },
+  {
+    value: -1, emoji: '🚫', label: 'Never again', hint: '',
+    // Outlined so it can't be mistaken for the soft rose of "Love it".
+    idle: 'bg-red-100 ring-1 ring-red-300 hover:bg-red-200',
+    on: 'bg-red-600 ring-2 ring-red-700',
+  },
 ]
 
 export const scaleFor = (value) => SCALE.find((s) => s.value === value)

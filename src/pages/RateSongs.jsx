@@ -94,9 +94,12 @@ const RateSongs = () => {
       {/* Sticky legend + progress */}
       <div className="sticky top-20 z-30 bg-white border-b shadow-sm">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600 mb-2">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-600 mb-2">
             {SCALE.map((s) => (
-              <span key={s.value} className="whitespace-nowrap">
+              <span
+                key={s.value}
+                className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 whitespace-nowrap ${s.idle}`}
+              >
                 {s.emoji} {s.label}
               </span>
             ))}
@@ -150,23 +153,24 @@ const RateSongs = () => {
                     >
                       {song.title}
                     </span>
-                    <div className="flex gap-0.5 flex-shrink-0">
-                      {SCALE.map((s) => (
-                        <button
-                          key={s.value}
-                          type="button"
-                          onClick={() => setRating(song.id, s.value)}
-                          title={`${s.label}${s.hint ? ' — ' + s.hint : ''}`}
-                          aria-label={`${song.title}: ${s.label}`}
-                          className={`w-8 h-8 rounded-md text-sm leading-none transition-all ${
-                            current === s.value && touched
-                              ? 'bg-band-highlight/15 ring-2 ring-band-highlight'
-                              : 'hover:bg-gray-100 opacity-40 hover:opacity-100'
-                          }`}
-                        >
-                          {s.emoji}
-                        </button>
-                      ))}
+                    <div className="flex gap-1 flex-shrink-0">
+                      {SCALE.map((s) => {
+                        const selected = touched && current === s.value
+                        return (
+                          <button
+                            key={s.value}
+                            type="button"
+                            onClick={() => setRating(song.id, s.value)}
+                            title={`${s.label}${s.hint ? ' — ' + s.hint : ''}`}
+                            aria-label={`${song.title}: ${s.label}`}
+                            aria-pressed={selected}
+                            className={`w-9 h-9 rounded-lg text-base leading-none flex items-center
+                                        justify-center transition-all ${selected ? s.on : s.idle}`}
+                          >
+                            {s.emoji}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 )

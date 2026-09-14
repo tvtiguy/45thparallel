@@ -16,8 +16,7 @@ const EMPTY_FORM = {
 const ManageShows = () => {
   const [password, setPassword] = useState(() => sessionStorage.getItem('adminPw') || '')
   const [unlocked, setUnlocked] = useState(() => Boolean(sessionStorage.getItem('adminPw')))
-  const [events, setEvents] = useState([])
-  const [pastEvents, setPastEvents] = useState([])
+  const [allEvents, setAllEvents] = useState([])
   const [showPast, setShowPast] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [editingId, setEditingId] = useState(null)
@@ -46,12 +45,14 @@ const ManageShows = () => {
       })
   }, [])
 
-  // Load current shows (GET is public).
-  const load = () =>
-    fetchEvents().then((data) => {
-      setEvents(upcomingSorted(data))
-      setPastEvents(pastSorted(data))
-    })
+  // Load current shows (GET is public). Only used on first paint: after a save
+  // or delete we update the list from the server's own response instead of
+  // re-reading, since storage can briefly still serve the previous version and
+  // would paint the change back out.
+  const load = () => fetchEvents().then(setAllEvents)
+
+  const events = upcomingSorted(allEvents)
+  const pastEvents = pastSorted(allEvents)
   useEffect(() => {
     load()
   }, [])
@@ -133,7 +134,9 @@ const ManageShows = () => {
       setForm(EMPTY_FORM)
       setEditingId(null)
       setStatus(`${editing ? 'Updated' : 'Added'} ${data.venue}.`)
-      await load()
+      setAllEvents((prev) =>
+        editing ? prev.map((x) => (x.id === data.id ? data : x)) : [...prev, data]
+      )
     } catch (err) {
       setError(err.message)
     } finally {
@@ -155,7 +158,7 @@ const ManageShows = () => {
       if (!res.ok) throw new Error(data.error || 'Something went wrong.')
       if (editingId === event.id) cancelEdit()
       setStatus(`Deleted ${event.venue}.`)
-      await load()
+      setAllEvents((prev) => prev.filter((x) => x.id !== event.id))
     } catch (err) {
       setError(err.message)
     } finally {

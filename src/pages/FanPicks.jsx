@@ -80,9 +80,8 @@ const FanPicks = () => {
             What do you love hearing us play?
           </h1>
           <p className="text-gray-300 text-sm">
-            Hi {person.name}! Skim through and tap the heart on any song you love hearing us do.
-            Skip anything you don&rsquo;t feel strongly about — no need to get through the whole
-            list. Your picks save automatically.
+            Hi {person.name}! Skim through and tap any song you love hearing us do. Do the whole
+            list — or just do part. Your picks save automatically.
           </p>
         </div>
       </section>
@@ -96,7 +95,7 @@ const FanPicks = () => {
           className="w-full rounded-lg border border-gray-300 px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-band-highlight"
         />
         <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-          <span>{count > 0 ? `${count} picked` : 'Tap a heart to pick a song'}</span>
+          <span>{count > 0 ? `${count} picked` : 'Tap a song to pick it'}</span>
           <span>
             {saveState === 'saving' && 'Saving…'}
             {saveState === 'saved' && 'Saved'}

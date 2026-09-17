@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import songs from '../data/songs.json'
-import { DEFAULT_RATING, scaleFor } from '../lib/survey'
+import {
+  DEFAULT_RATING,
+  scaleFor,
+  inRotation,
+  outOfRotation,
+  lastPlayedLabel,
+} from '../lib/survey'
 
-// A song counts as "in rotation" if it shows up in most setlists, and as
-// "dormant" if it has all but dropped out. The gap between is left alone.
-const PLAYED_A_LOT = 11
-const PLAYED_RARELY = 4
 const LIKED = 4.0
 const NOT_LIKED = 2.75
-
-const SONG_BY_ID = Object.fromEntries(songs.map((s) => [s.id, s]))
 
 const Bar = ({ value }) => {
   const pct = Math.max(0, ((value + 1) / 6) * 100)
@@ -52,13 +52,18 @@ const SongRow = ({ row, showPlays = true }) => (
           🚫 {row.vetoes.join(', ')}
         </span>
       )}
+      {row.dislikes.length > 0 && (
+        <span className="ml-2 text-xs bg-amber-100 text-amber-800 rounded px-1.5 py-0.5 whitespace-nowrap">
+          👎 {row.dislikes.join(', ')}
+        </span>
+      )}
+      {showPlays && (
+        <span className="block text-xs text-gray-400 mt-0.5">
+          in {row.song.recent} of the last 8 shows · {lastPlayedLabel(row.song)}
+        </span>
+      )}
     </div>
     <PerPerson row={row} />
-    {showPlays && (
-      <span className="text-xs text-gray-400 whitespace-nowrap hidden sm:inline">
-        {row.song.plays}/17
-      </span>
-    )}
     <Bar value={row.avg} />
     <span className="w-8 text-right text-gray-600 tabular-nums">{row.avg.toFixed(1)}</span>
   </div>
@@ -146,19 +151,24 @@ const SurveyResults = () => {
       rows,
       fanCounts,
       revive: rows
-        .filter((r) => r.avg >= LIKED && r.song.plays <= PLAYED_RARELY)
+        .filter((r) => r.avg >= LIKED && outOfRotation(r.song))
         .sort((a, b) => b.avg - a.avg),
-      // Any active "Meh" or veto on a song you play constantly is worth a
+      // Any active thumbs-down or veto on a song in the current sets is worth a
       // conversation, even when the average still looks respectable.
       retire: rows
         .filter(
           (r) =>
-            r.song.plays >= PLAYED_A_LOT &&
+            inRotation(r.song) &&
             (r.avg <= NOT_LIKED || r.vetoes.length > 0 || r.dislikes.length > 0)
         )
         .sort((a, b) => a.avg - b.avg),
       dontTeach: rows
-        .filter((r) => r.song.plays <= PLAYED_RARELY && (r.avg <= NOT_LIKED || r.vetoes.length > 0))
+        .filter(
+          (r) =>
+            outOfRotation(r.song) &&
+            !r.byPerson.some((p) => p.touched && p.value >= LIKED) &&
+            (r.avg <= NOT_LIKED || r.vetoes.length > 0 || r.dislikes.length > 0)
+        )
         .sort((a, b) => a.avg - b.avg),
       divisive: rows.filter((r) => r.spread >= 3).sort((a, b) => b.spread - a.spread || b.avg - a.avg),
       all: [...rows].sort((a, b) => b.avg - a.avg),
@@ -231,15 +241,15 @@ const SurveyResults = () => {
         </div>
 
         <Section
-          title="🔥 Loved but rarely played"
-          blurb="You all like these and they've drifted out of rotation. Cheapest wins — you already know them."
+          title="🔥 Loved, but not in your current sets"
+          blurb="Rated highly, but not played in any of your last 8 shows. Cheapest wins — you already know them."
           rows={a.revive}
           empty="Nothing here yet."
         />
 
         <Section
-          title="⚠️ Played a lot, but somebody's over it"
-          blurb="Songs surviving on inertia. Anything in heavy rotation where someone actively said “Meh” or “Never again” — even one person, even if the average still looks fine."
+          title="⚠️ In your current sets, but somebody voted it down"
+          blurb="Played in at least one of your last 8 shows, and at least one person gave it a 👎 or a 🚫. A 👎 isn’t a veto — it’s just worth a conversation."
           rows={a.retire}
           empty="Nothing here yet."
         />
@@ -252,8 +262,8 @@ const SurveyResults = () => {
         />
 
         <Section
-          title="💤 Don't bother teaching the new guy"
-          blurb="Already out of rotation and nobody's pushing for them. Skip these in rehearsal."
+          title="💤 Out of your sets, and nobody’s pushing for it"
+          blurb="Not played in your last 8 shows, nobody rated it Good or better, and someone voted it down. Probably skip these when teaching the new guy."
           rows={a.dontTeach}
           empty="Nothing here yet."
         />

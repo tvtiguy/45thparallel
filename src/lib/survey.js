@@ -37,6 +37,20 @@ export const SCALE = [
 
 export const scaleFor = (value) => SCALE.find((s) => s.value === value)
 
+// Rotation is measured from songs actually listed in a set (not the "Left out"
+// or "Ready if needed" lists carried at the bottom of each sheet), over the
+// band's last 8 shows. `song.recent` is how many of those 8 it was played in.
+export const RECENT_WINDOW = 8
+export const inRotation = (song) => song.recent > 0
+export const outOfRotation = (song) => song.recent === 0
+
+export function lastPlayedLabel(song) {
+  if (!song.lastPlayed) return 'not in a set since Dec ’24'
+  const d = new Date(`${song.lastPlayed}T00:00:00`)
+  const month = d.toLocaleDateString('en-US', { month: 'short' })
+  return `last played ${month} ’${String(d.getFullYear()).slice(2)}`
+}
+
 // True when the serverless API isn't there at all -- i.e. running plain `vite`
 // locally. Lets the pages be designed offline without faking away real errors:
 // a genuine bad token still comes back as JSON and is reported normally.

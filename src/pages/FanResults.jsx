@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import songs from '../data/songs.json'
+import { outOfRotation, lastPlayedLabel } from '../lib/survey'
 
 // Fan picks on their own page, separate from the band's ballot. Same password
 // as the main results page.
-const PLAYED_RARELY = 4
 
 const FanResults = () => {
   const [password, setPassword] = useState(() => sessionStorage.getItem('adminPw') || '')
@@ -53,7 +53,7 @@ const FanResults = () => {
       responded,
       ranked,
       // Fans love it, but it's fallen out of your rotation.
-      hidden: ranked.filter((r) => r.song.plays <= PLAYED_RARELY),
+      hidden: ranked.filter((r) => outOfRotation(r.song)),
     }
   }, [ballots])
 
@@ -99,7 +99,7 @@ const FanResults = () => {
       <span className="text-xs text-gray-400 hidden sm:inline whitespace-nowrap">
         {r.who.join(', ')}
       </span>
-      <span className="text-xs text-gray-400 whitespace-nowrap">{r.song.plays}/17</span>
+      <span className="text-xs text-gray-400 whitespace-nowrap">{lastPlayedLabel(r.song)}</span>
     </div>
   )
 
@@ -108,8 +108,8 @@ const FanResults = () => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <h1 className="text-3xl font-display text-band-dark mb-1">Fan Picks</h1>
         <p className="text-gray-500 text-sm mb-6">
-          Counted entirely separately from the band&rsquo;s ballot. The last column is how many of
-          your 17 setlists the song appears in.
+          Counted entirely separately from the band&rsquo;s ballot. The last column is when you last
+          played it in a set.
         </p>
 
         <div className="bg-white rounded-xl shadow-sm p-5 mb-8">
@@ -135,10 +135,10 @@ const FanResults = () => {
         {data.hidden.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-display text-band-dark mb-1">
-              🎯 They love it, you rarely play it
+              🎯 They love it, but it’s not in your current sets
             </h2>
             <p className="text-gray-500 text-sm mb-3">
-              Fan favourites that have drifted out of your rotation.
+              Fan favorites you haven’t played in any of your last 8 shows.
             </p>
             <div className="bg-white rounded-xl shadow-sm divide-y">
               {data.hidden.map((r) => (

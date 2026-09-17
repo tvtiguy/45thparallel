@@ -62,7 +62,7 @@ const FanResults = () => {
       <div className="pt-28 pb-20 min-h-screen bg-band-light">
         <div className="max-w-sm mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 shadow-lg">
-            <h1 className="text-2xl font-display text-band-dark mb-6 text-center">Fan Picks</h1>
+            <h1 className="text-2xl font-display text-band-dark mb-6 text-center">Parallelafan Picks</h1>
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -106,7 +106,7 @@ const FanResults = () => {
   return (
     <div className="pt-24 pb-24 min-h-screen bg-band-light">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
-        <h1 className="text-3xl font-display text-band-dark mb-1">Fan Picks</h1>
+        <h1 className="text-3xl font-display text-band-dark mb-1">Parallelafan Picks</h1>
         <p className="text-gray-500 text-sm mb-6">
           Counted entirely separately from the band&rsquo;s ballot. The last column is when you last
           played it in a set.
@@ -148,10 +148,10 @@ const FanResults = () => {
           </div>
         )}
 
-        <h2 className="text-xl font-display text-band-dark mb-1">Every fan pick</h2>
+        <h2 className="text-xl font-display text-band-dark mb-1">Every Parallelafan pick</h2>
         <p className="text-gray-500 text-sm mb-3">Most-loved first.</p>
         {data.ranked.length === 0 ? (
-          <p className="text-gray-400 text-sm italic">No fan picks yet.</p>
+          <p className="text-gray-400 text-sm italic">No Parallelafan picks yet.</p>
         ) : (
           <div className="bg-white rounded-xl shadow-sm divide-y">
             {data.ranked.map((r) => (

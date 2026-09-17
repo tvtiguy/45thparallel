@@ -301,13 +301,13 @@ const SurveyResults = () => {
 
         {/* Fans */}
         <div className="mb-10">
-          <h2 className="text-xl font-display text-band-dark mb-1">🎧 What the fans love</h2>
+          <h2 className="text-xl font-display text-band-dark mb-1">🎧 What the Parallelafans love</h2>
           <p className="text-gray-500 text-sm mb-3">
             Counted separately from the band. {a.fans.filter((f) => f.started).length} of{' '}
             {a.fans.length} have responded.
           </p>
           {a.fanCounts.length === 0 ? (
-            <p className="text-gray-400 text-sm italic">No fan picks yet.</p>
+            <p className="text-gray-400 text-sm italic">No Parallelafan picks yet.</p>
           ) : (
             <div className="bg-white rounded-xl shadow-sm divide-y">
               {a.fanCounts.map((r) => (

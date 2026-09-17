@@ -77,7 +77,7 @@ const FanPicks = () => {
       <section className="bg-band-dark text-white py-7">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <h1 className="text-2xl md:text-3xl font-display mb-2">
-            What do you love hearing us play?
+            Hey Parallelafans — what do you love hearing us play?
           </h1>
           <p className="text-gray-300 text-sm">
             Hi {person.name}! Skim through and tap any song you love hearing us do. Do the whole

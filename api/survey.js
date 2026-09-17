@@ -24,6 +24,7 @@ const ROSTER = {
   'fan-l4p9wb': { name: 'Lindsay', type: 'fan' },
   'fan-krgox0g': { name: 'Ken Rhodes', type: 'fan' },
   'fan-abc3pzs': { name: 'Adam Boam', type: 'fan' },
+  'fan-dg7xtx7': { name: 'Debbie Gaspar', type: 'fan' },
 }
 
 const blobPath = (token) => `survey/${token}.json`

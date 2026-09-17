@@ -10,6 +10,7 @@ import ManageShows from './pages/ManageShows'
 import RateSongs from './pages/RateSongs'
 import FanPicks from './pages/FanPicks'
 import SurveyResults from './pages/SurveyResults'
+import FanResults from './pages/FanResults'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/rate/:token" element={<RateSongs />} />
           <Route path="/picks/:token" element={<FanPicks />} />
           <Route path="/song-results-3n8k" element={<SurveyResults />} />
+          <Route path="/fan-results-3n8k" element={<FanResults />} />
         </Routes>
       </main>
       <Footer />

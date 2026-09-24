@@ -79,6 +79,12 @@ const RateSongs = () => {
 
   return (
     <div className="pt-20 pb-24 min-h-screen bg-band-light">
+      {saveState === 'error' && (
+        <div className="fixed bottom-0 inset-x-0 z-50 bg-red-600 text-white px-4 py-3 text-sm text-center">
+          Your last change didn&rsquo;t save. Check your connection — this page will keep trying as
+          you rate. Don&rsquo;t close it until this message clears.
+        </div>
+      )}
       {/* Header */}
       <section className="bg-band-dark text-white py-6">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">

@@ -74,6 +74,11 @@ const FanPicks = () => {
 
   return (
     <div className="pt-20 pb-24 min-h-screen bg-band-light">
+      {saveState === 'error' && (
+        <div className="fixed bottom-0 inset-x-0 z-50 bg-red-600 text-white px-4 py-3 text-sm text-center">
+          Your last pick didn&rsquo;t save. Check your connection and try tapping it again.
+        </div>
+      )}
       <section className="bg-band-dark text-white py-7">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <h1 className="text-2xl md:text-3xl font-display mb-2">

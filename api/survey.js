@@ -22,7 +22,9 @@ const ROSTER = {
   // Fans — hearts only
   'fan-g7m2kd': { name: 'Ginny', type: 'fan' },
   'fan-l4p9wb': { name: 'Lindsay', type: 'fan' },
-  'fan-krgox0g': { name: 'Ken Rhodes', type: 'fan' },
+  // Archived: former member, not counted in the Parallelafan tallies. His
+  // picks are still stored and his link still works.
+  'fan-krgox0g': { name: 'Ken Rhodes', type: 'archive' },
   'fan-abc3pzs': { name: 'Adam Boam', type: 'fan' },
   'fan-dg7xtx7': { name: 'Debbie Gaspar', type: 'fan' },
   'fan-ln6pf7u': { name: 'Lin', type: 'fan' },

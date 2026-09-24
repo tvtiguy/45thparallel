@@ -51,9 +51,14 @@ export function lastPlayedLabel(song) {
   return `last played ${month} ’${String(d.getFullYear()).slice(2)}`
 }
 
-// True when the serverless API isn't there at all -- i.e. running plain `vite`
-// locally. Lets the pages be designed offline without faking away real errors:
-// a genuine bad token still comes back as JSON and is reported normally.
+// Preview mode lets these pages be designed against the plain vite dev server,
+// which doesn't run the serverless function. It is restricted to localhost on
+// purpose: on the live site a hiccup on the first request must surface as an
+// error, never silently switch saving off while still reporting "Saved".
+const isLocal =
+  typeof location !== 'undefined' &&
+  ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
+
 let previewMode = false
 
 export const isPreview = () => previewMode
@@ -63,6 +68,7 @@ export async function loadBallot(token) {
   try {
     res = await fetch(`/api/survey?token=${encodeURIComponent(token)}`)
   } catch {
+    if (!isLocal) throw new Error('Could not reach the server. Check your connection and reload.')
     previewMode = true
     return previewBallot(token)
   }
@@ -71,7 +77,8 @@ export async function loadBallot(token) {
   try {
     data = JSON.parse(body)
   } catch {
-    // Not JSON -- the endpoint doesn't exist (dev server served index.html).
+    // Not JSON -- locally that means no API; live it means something is wrong.
+    if (!isLocal) throw new Error('The server returned something unexpected. Please reload.')
     previewMode = true
     return previewBallot(token)
   }

@@ -1,35 +1,8 @@
 import { Link } from 'react-router-dom'
 import Hero from '../components/Hero'
+import { currentMembers as bandMembers } from '../data/members'
 
 const Home = () => {
-  const bandMembers = [
-    {
-      name: 'Mark Watson',
-      role: 'Guitar & Vocals',
-      image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/2d4f4a97-6065-4f67-8d5c-905bdd217db0/IMG_6610.jpg',
-    },
-    {
-      name: 'Rich Boam',
-      role: 'Drums & Vocals',
-      image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/416e4f19-5c0e-425f-848b-27bc22d3cccd/IMG_20220504_140420446-1.jpg',
-    },
-    {
-      name: 'John Wesson',
-      role: 'Guitar & Vocals',
-      image: 'https://images.squarespace-cdn.com/content/v1/67d2399dd7fcaf11782ef34b/36e315c2-cced-4007-8013-8bc2cef95d87/JohnEdited.png',
-    },
-    {
-      name: 'Mark Moulding',
-      role: 'Keyboards',
-      image: '/mark-moulding.jpg',
-    },
-    {
-      name: 'Tracy Dragoo',
-      role: 'Bass & Vocals',
-      image: '/tracy-dragoo.png',
-      imgClass: 'scale-[1.6] origin-top -translate-y-8 group-hover:scale-[1.7]',
-    },
-  ]
 
   return (
     <div>
@@ -71,7 +44,7 @@ const Home = () => {
           <div className="text-center mb-16">
             <h2 className="section-title">Who We Are</h2>
             <p className="section-subtitle">
-              Five experienced musicians bringing decades of rock, blues, and everything in between
+              Four experienced musicians bringing decades of rock, blues, and everything in between
               to stages across the Portland metro area.
             </p>
           </div>

@@ -7,6 +7,7 @@ import {
   outOfRotation,
   lastPlayedLabel,
 } from '../lib/survey'
+import PasswordGate from '../components/PasswordGate'
 
 const LIKED = 4.0
 const NOT_LIKED = 2.75
@@ -178,33 +179,14 @@ const SurveyResults = () => {
 
   if (!unlocked) {
     return (
-      <div className="pt-28 pb-20 min-h-screen bg-band-light">
-        <div className="max-w-sm mx-auto px-4">
-          <div className="bg-white rounded-2xl p-8 shadow-lg">
-            <h1 className="text-2xl font-display text-band-dark mb-6 text-center">Survey Results</h1>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                fetchResults(password)
-              }}
-              className="space-y-4"
-            >
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-band-highlight"
-                autoFocus
-              />
-              {error && <p className="text-red-600 text-sm">{error}</p>}
-              <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-50">
-                {busy ? 'Checking…' : 'Unlock'}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+      <PasswordGate
+        title="Survey Results"
+        password={password}
+        setPassword={setPassword}
+        onSubmit={(e) => { e.preventDefault(); fetchResults(password) }}
+        error={error}
+        busy={busy}
+      />
     )
   }
 

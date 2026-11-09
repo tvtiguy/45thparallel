@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchEvents, upcomingSorted, pastSorted, formatDateParts, displayTime, timeOptions } from '../lib/events'
+import PasswordGate from '../components/PasswordGate'
 
 const TIME_OPTS = timeOptions()
 
@@ -172,27 +173,14 @@ const ManageShows = () => {
   // Password gate
   if (!unlocked) {
     return (
-      <div className="pt-28 pb-20 min-h-screen bg-band-light">
-        <div className="max-w-sm mx-auto px-4">
-          <div className="bg-white rounded-2xl p-8 shadow-lg">
-            <h1 className="text-2xl font-display text-band-dark mb-6 text-center">Manage Shows</h1>
-            <form onSubmit={unlock} className="space-y-4">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className={inputClass}
-                autoFocus
-              />
-              {unlockError && <p className="text-red-600 text-sm">{unlockError}</p>}
-              <button type="submit" disabled={unlocking} className="btn-primary w-full disabled:opacity-50">
-                {unlocking ? 'Checking…' : 'Unlock'}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+      <PasswordGate
+        title="Manage Shows"
+        password={password}
+        setPassword={setPassword}
+        onSubmit={unlock}
+        error={unlockError}
+        busy={unlocking}
+      />
     )
   }
 
